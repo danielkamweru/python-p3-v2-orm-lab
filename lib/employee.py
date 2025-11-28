@@ -56,7 +56,33 @@ class Employee:
         else:
             raise ValueError(
                 "department_id must reference a department in the database")
-
+    @property
+    def year(self):
+        return self._year
+    @year.setter
+    def year(self, year):
+        if isinstance(year, int) and year >= 2000:
+            self._year = year
+        else:
+            raise ValueError("year must be >= 2000")
+    @property
+    def summary(self):
+        return self._summary
+    @summary.setter
+    def summary(self, summary):
+        if isinstance(summary, str) and len(summary):
+            self._summary = summary
+        else:
+            raise ValueError("summary should be a non-empty string")
+    @property
+    def employee_id(self):
+        return self._employee_id
+    @employee_id.setter
+    def employee_id(self, employee_id):
+        if isinstance(employee_id, int) and Employee.find_by_id(employee_id):
+            self._employee_id = employee_id
+        else:
+            raise ValueError("employee_id must reference an existing Employee")
     @classmethod
     def create_table(cls):
         """ Create a new table to persist the attributes of Employee instances """
@@ -165,7 +191,7 @@ class Employee:
     def find_by_id(cls, id):
         """Return Employee object corresponding to the table row matching the specified primary key"""
         sql = """
-            SELECT *
+            SELECT * 
             FROM employees
             WHERE id = ?
         """
@@ -187,4 +213,7 @@ class Employee:
 
     def reviews(self):
         """Return list of reviews associated with current employee"""
-        pass
+        from review import Review
+        all_reviews = Review.get_all()
+        return[rev for rev in all_reviews if rev.employee_id == self.id]
+        
